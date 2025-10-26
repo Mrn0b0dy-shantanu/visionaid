@@ -8,25 +8,22 @@ import cv2
 import pyttsx3
 from PIL import Image
 import torch
-
 from ultralytics import YOLO
 from transformers import BlipProcessor, BlipForConditionalGeneration
 from vosk import Model as VoskModel, KaldiRecognizer
 import sounddevice as sd
-
 # ---------------- CONFIG ----------------
-VOSK_MODEL_PATH = os.path.expanduser("~/models/vosk/vosk-model-small-en-us-0.15")
+VOSK_MODEL_PATH = "vosk-model-small-en-us-0.15"
 CAMERA_INDEX = 0
-FRAME_WIDTH = 640
-FRAME_HEIGHT = 480
-FOCAL_LENGTH = 700.0
+FRAME_WIDTH = 1920
+FRAME_HEIGHT = 1080
+FOCAL_LENGTH = 850.0
 KNOWN_WIDTHS = {"person": 0.5, "car": 1.8, "bicycle": 0.5, "motorbike": 0.6, "truck": 2.5, "bus": 2.5}
 DETECTION_CONF = 0.45
-
-COLLISION_DISTANCE = 2.0
+COLLISION_DISTANCE = 1.0
 AREA_TRIGGER_RATIO = 0.25
-OBSTACLE_COOLDOWN = 3.0
-VOICE_TRIGGER_COOLDOWN = 1.0
+OBSTACLE_COOLDOWN = 4.0
+VOICE_TRIGGER_COOLDOWN = 1.5
 
 # Voice commands
 LISTEN_PHRASES = ["what am i seeing", "describe", "what do i see", "stop", "start"]
@@ -41,11 +38,19 @@ VOICE_BAND_RATIO_THRESHOLD = 0.12
 
 # ---------------- Initialization ----------------
 tts_engine = pyttsx3.init()
-tts_engine.setProperty("rate", 160)
+tts_engine.setProperty("rate", 260)
 tts_engine.setProperty("volume", 1.0)
 
-yolo_model = YOLO("yolov8n.pt")
-
+yolo_model = YOLO("yolov8m.pt")
+use_cpu = torch.cpu.is_available()
+device = torch.device("cpu")
+if use_cpu:
+    try:
+        yolo_model.to(device)
+        torch.backends.cudnn.benchmark = True
+    except Exception as e:
+        print (e)
+print("Using device:", device)
 device = torch.device("cpu")
 blip_processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-base")
 blip_model = BlipForConditionalGeneration.from_pretrained(
@@ -147,6 +152,7 @@ def vosk_listener_loop(trigger_callback):
                         continue
     except Exception as e:
         print("VOSK listener error:", e)
+
 
 # ---------------- BLIP caption ----------------
 def run_caption_and_speak(snapshot_bgr):
