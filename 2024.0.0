@@ -1,0 +1,9 @@
+Collecting openvino
+  Downloading openvino-2025.3.0-19807-cp310-cp310-win_amd64.whl (40.6 MB)
+     -------------------------------------- 40.6/40.6 MB 623.4 kB/s eta 0:00:00
+Collecting openvino-telemetry>=2023.2.1
+  Downloading openvino_telemetry-2025.2.0-py3-none-any.whl (25 kB)
+Requirement already satisfied: numpy<2.3.0,>=1.16.6 in d:\vsc stuff i did\websites\visionaid\venv\lib\site-packages (from openvino) (1.26.4)
+Requirement already satisfied: packaging in d:\vsc stuff i did\websites\visionaid\venv\lib\site-packages (from openvino) (25.0)
+Installing collected packages: openvino-telemetry, openvino
+Successfully installed openvino-2025.3.0 openvino-telemetry-2025.2.0
